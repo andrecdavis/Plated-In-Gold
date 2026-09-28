@@ -109,7 +109,7 @@ After cleaning and filtering, we are left with the following spread of data poin
 The vast majority of listings come from the USA, and most watches are Ultra models, which is Apple's flagship family.
 <p align="center">
   <img src="images_hd/md_country_donut_hd.png" width="460">
-  <img src="images_hd/md_model_by_count_donut_hd.png" width="475">
+  <img src="images_hd/md_model_by_count_donut_hd.png" width="460">
 </p>
 
 
