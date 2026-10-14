@@ -11,22 +11,31 @@ async def main():
     errs = []
     async with async_playwright() as p:
         b = await p.chromium.launch()
-        for name, w, h in [('desktop', 1366, 900), ('mobile', 390, 844)]:
-            pg = await b.new_page(viewport={'width': w, 'height': h})
-            pg.on('pageerror', lambda e: errs.append(str(e)))
-            pg.on('console', lambda m: m.type == 'error' and errs.append(m.text))
-            await pg.goto(URL, wait_until='networkidle'); await pg.wait_for_timeout(1500)
-            async def shot(sel, fn, dy=-120):
-                await pg.locator(sel).scroll_into_view_if_needed(); await pg.evaluate(f'window.scrollBy(0,{dy})')
-                await pg.wait_for_timeout(600); await pg.screenshot(path=os.path.join(SHOTS, fn))
-            if name == 'desktop':
-                await pg.screenshot(path=os.path.join(SHOTS, '01_intro.png'))
-                await shot('#glance', '02_data_at_a_glance.png')
-                await pg.check('#fGold'); await shot('#pitfall', '03_gold_pitfall_filtered.png')
-                await pg.uncheck('#fGold')
-                await pg.click('button[data-p=s2gold]'); await shot('#waterfall', '04_shap_listing_explorer.png', -300)
-            else:
-                await shot('#glance', '05_mobile_data_at_glance.png')
+        for mode in ['light', 'dark']:
+            for name, w, h in [('desktop', 1366, 900), ('mobile', 390, 844)]:
+                pg = await b.new_page(viewport={'width': w, 'height': h}, color_scheme=mode)
+                pg.on('pageerror', lambda e: errs.append(str(e)))
+                pg.on('console', lambda m: m.type == 'error' and errs.append(m.text))
+                await pg.goto(URL, wait_until='networkidle'); await pg.wait_for_timeout(1500)
+                async def shot(sel, fn, dy=-200):
+                    await pg.locator(sel).scroll_into_view_if_needed(); await pg.evaluate(f'window.scrollBy(0,{dy})')
+                    await pg.wait_for_timeout(600); await pg.screenshot(path=os.path.join(SHOTS, f'{mode}_{name}_{fn}.png'))
+                await pg.screenshot(path=os.path.join(SHOTS, f'{mode}_{name}_01_intro.png'))
+                await shot('#countryDonut', '02_country_donut')
+                await shot('#modelDonut', '03_family_donut')
+                await shot('#scatter', '04_price_explorer', -150)
+                await pg.check('#fGold'); await shot('#pitfall', '05_gold_pitfall_filtered', -120); await pg.uncheck('#fGold')
+                await pg.click('button[data-p=s2gold]'); await shot('#waterfall', '06_shap_explorer', -300)
+                await pg.close()
+        # toggle test: light -> dark re-themes charts without errors
+        pg = await b.new_page(viewport={'width': 1366, 'height': 900}, color_scheme='light')
+        pg.on('pageerror', lambda e: errs.append(str(e)))
+        await pg.goto(URL, wait_until='networkidle'); await pg.wait_for_timeout(1000)
+        await pg.click('#themeToggle'); await pg.wait_for_timeout(800)
+        t = await pg.evaluate("[document.documentElement.dataset.theme, localStorage.getItem('theme'), document.getElementById('scatter')._fullLayout.font.color]")
+        print('toggle ->', t)
+        if t[0] != 'dark' or t[1] != 'dark' or t[2].lower() != '#e8e8e8':
+            errs.append('theme toggle failed: ' + str(t))
         await b.close()
     print('JS errors:', errs or 'none')
     sys.exit(1 if errs else 0)
