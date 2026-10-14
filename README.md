@@ -1,308 +1,136 @@
 # Plated in Gold: What Drives Apple Smartwatch Resale Prices?
 
-We analyze thousands of third-party Apple smartwatch listings, web-scraped from online marketplaces, to provide a snapshot of the market and learn which factors most impact list price. The dataset contains information of condition, seller ID, case size, country of listing, international shipping availability, price, and a title column. From the title column we use regex to extract the model, premium markers like Hèrmes special editions and materials like titanium and ceramic, and aftermarket additions such as 24k gold plating. 
+**▶ Interactive version: [andrecdavis.github.io/Plated-In-Gold](https://andrecdavis.github.io/Plated-In-Gold/)**. It has filters, a price explorer and a per-listing SHAP explainer.
 
-It's important to state right away the largest caveat of this dataset: these are list prices, not completed transactions. However, we believe that analyses of this type of data are still meaningful, and can help us understand, for example, which product, seller, and geographic characteristics are associated with differences in asking prices. Moreover, as we'll see below, it can reveal unusual pricing patterns that warrant further investigation.
+## Introduction and question
 
-We use CatBoost Regressor, a Python ML package developed to handle datasets with high-dimensional categorical variables, plus SHapley Additive exPlanations (SHAP) to arrive at a ranking of features by importance to list price.
+We analyze **2,328** third-party Apple Watch listings, web-scraped from online marketplaces, to answer one question: *which product, seller and geographic factors are associated with higher or lower asking prices?* We use regular expressions on the title to extract the model, premium markers (Hermès, titanium, ceramic, premium bands) and aftermarket additions such as **24k gold plating**. We then fit a CatBoost model and explain it with SHAP (SHapley Additive exPlanations).
 
-<p align="center">
-  <img src="images_hd/md_SHAP_with_power_seller_hd.png" width="800", height='auto'>
-</p>
-<p align="center">
-  <em>Units are in USD. Bigger bar = greater impact</em>
-</p>
+> **The largest caveat:** these are *list prices*, not completed sales. They describe what sellers ask, not what buyers pay.
 
-For those unfamiliar with SHAP, this ranking tells us specifically how our predictive price model assigns value to individual features. Smartwatch model is the most important, with about $27 worth of weight, followed by country, condition, and seller id. We explain more about SHAP and how we arrived at this ranking in the section [What is SHAP](#what-is-shap). 
+## Contents
+1. [Data at a glance](#data-at-a-glance)
+2. [The gold-plating pitfall](#the-gold-plating-pitfall)
+3. [Modeling: CatBoost](#modeling-catboost)
+4. [Explaining the model with SHAP](#explaining-the-model-with-shap)
+5. [Key findings](#key-findings)
+6. [Limitations](#limitations)
+7. [Future work](#future-work)
+8. [How to reproduce](#how-to-reproduce)
 
+## Data at a glance
 
+The raw file has 3,607 listings across several brands, and Apple accounts for 65.7% of them. Cleaning (`src/cleaning.py`) does the following:
+- removes accents and lower-cases titles
+- maps Spanish condition and country labels to English
+- drops prices above $2,000
+- keeps Apple listings only
+- removes bundles, lots and iPhones
+- sets condition to *New* when the title says "brand new" or "unopened" (33 listings changed)
 
+| Entries | Sellers | Countries | Models |
+|:-:|:-:|:-:|:-:|
+| **2,328** | **1,430** | **20** | **18** |
 
-### SHAP can help us avoid common pitfalls
+77.4% of listings come from the USA, and the UK is next at 9.1%. Half (50.0%) are Ultra models, Apple's flagship family, and 46.8% are Series models.
 
-Let us highlight an interesting nuance sometimes present in this type of data: When grouped by model, and arranged in order of average price, outdated models such as Series 2, 3 and 4 are actually listed higher than even the current-gen flagship Ultra 3. 
+<p align="center"><img src="images/01_country_donut.png" width="420"> <img src="images/02_family_donut.png" width="420"></p>
 
-<p align="center">
-  <img src="images_hd/md_price_by_model_all_hd.png" width='800', height='auto'>
-</p>
+The UK has the lowest average price of any country with 30+ listings. Leaving it out raises the overall average from $578 to $593.
 
-Is this just wishful thinking, or perhaps predatory bait-pricing on the sellers' behalf? When we dig a little deeper, we notice that many of these models are actually aftermarket plated in 24k gold. This led us to engineer the binary feature called 'gold', and when we look at Series 2,3, and 4 watches, we see that a high percentage of them are gold-plated. Gold-plated watches were listed for, on average, 50% more than their standard counterparts. 
+<p align="center"><img src="images/03_country_means.png" width="800"></p>
 
+**Listing type.** Individuals (sellers with one listing, n = 1,257) average $561. That is 5.8% less than power sellers with 2+ listings ($596, n = 1,071). The gap is significant (Welch t-test p = 5.1e-8), but it is small inside the model: power_seller ranks 11th of 12 features.
 
-<p align="center">
-  <img src="images_hd/md_gold_plated_by_model_hd.png" height=600 width="auto">
-</p>
+<p align="center"><img src="images/04_listing_type.png" width="600"></p>
 
-Notice that the top three most highly-plated models, the Series 2, 4 and 3, are also the top three highest priced models. Notice also that no current-gen models are aftermarket gold-plated. However, as we will see in [Directions for Future Research](#directions-for-future-research), gold-plating does not completely resolve the mystery of why certain outdated models are sometimes listed at such a high price.
+## The gold-plating pitfall
 
+Grouped by model, the outdated **Series 2 ($743), Series 4 ($676) and Series 3 ($664) average more than the current-gen Ultra 3 ($651)**, which ranks 4th of 18.
 
+<p align="center"><img src="images/05_price_by_model.png" width="700"></p>
 
+Many of these older listings are aftermarket **24k gold-plated**. The three models with the highest gold share (Series 2 88%, Series 4 51%, Series 3 42%) are also the three highest-priced, and no current-gen listings are gold-plated. Within the 9 models that have gold-plated listings, gold-plated watches average **54.8% ($294) more** than standard ones of the same model (123 gold listings).
 
+<p align="center"><img src="images/06_gold_share_by_model.png" width="700"></p>
 
-## Table of Contents
+Once gold-plated listings are removed, the Ultra 3 becomes the highest-priced model. Gold doesn't explain everything, though: the standard Series 2 ($615) and Series 3 ($575) still average more than the Series 11 ($569).
 
-- [The Data at a Glance](#the-data-at-a-glance)
-- [What is SHAP](#what-is-shap)
-- [Global Model Results](#global-model-results)
-- [Key Findings](#key-findings)
-- [Limitations](#limitations)
-- [Directions for Future Research](#directions-for-future-research)
+<p align="center"><img src="images/07_price_by_model_no_gold.png" width="700"></p>
 
+## Modeling: CatBoost
 
+The model setup (`src/modeling.py`, the same settings as the original CatBoost notebook):
+- rows with missing values are dropped first
+- the data is split 80/20 with `random_state=43`, giving 1,585 training and 397 test listings
+- the model is a default `CatBoostRegressor()`, with model, country, condition and seller ID as categorical features
 
+| Variant | Features | Test R² | MAE |
+|---|---|:-:|:-:|
+| Headline | condition, case size, worldwide shipping, country, model, Hermès, cellular, gold, premium band, ceramic, seller ID | **0.53** | **$69.40** |
+| + power seller | the above + power_seller | 0.52 | $70.02 |
 
+## Explaining the model with SHAP
 
-## The Data at a Glance
+SHAP comes from game theory. For each listing, it splits the gap between the model's base value ($577) and that listing's prediction into a dollar amount for each feature. Averaging the absolute values over the test set gives a global ranking. **Model ranks first (±$26.94), followed by country ($21.09), condition ($19.03) and seller ID ($18.13).** The same top four appear with or without power_seller.
 
-The raw data is web-scraped from online marketplaces. Here is a random sample of five entries:
+<p align="center"><img src="images/08_shap_ranking.png" width="700"></p>
 
-<p align="center">
-  <img src="images_hd/md_original_data_sample_hd.png" height='auto' width="1500">
-</p>
-We note that the original data contains listings for brands other than Apple, however Apple accounts for about 66% of the listings.
+**Two listings, explained.** For a typical US Ultra 3 listing (the one closest to the median price), *model = Ultra 3* adds $62.08, *open box* adds $25.97 and the 49 mm case adds $13.81. No worldwide shipping subtracts $7.69.
 
+<p align="center"><img src="images/09_shap_typical_ultra3.png" width="700"></p>
 
+Features interact. In a hypothetical gold-plated Series 2, *gold = 1* adds $47.59 while *model = Series 2* subtracts $25.76.
 
-### Cleaning the Data:
-We first standardized the text entries by removing accents and special characters, rendered everything in lower case, and translated all listings to English. We used regex to identify bundle listings, as well as listings containing multiple broken smartwatches for parts.
-We then filtered the data to include only Apple products. We noticed inconsistencies between the condition column and the title column. For example, the title claims "Brand New", yet the condition is listed as "Used". In these cases, we replaced what was in the condition column with what we found in the title.
+<p align="center"><img src="images/10_shap_series2_gold.png" width="700"></p>
 
-### Feature Engineering
-Below is another random sample after using regex to extract the model, gold-plating, titanium, Hermès special editions, ceramic back, and premium bands such as the Milanese loop from the title column, as well as making a power_seller column which indicates whether a seller ID appears in two or more listings.
+**The UK effect.** UK listings average $428, against $593 elsewhere (Welch p = 1.8e-52). Their country SHAP values average −$106, against +$9 for other countries, and **212 of 212 UK listings get a negative country SHAP value** (33 of 33 in the test set).
 
+<p align="center"><img src="images/11_shap_country_uk.png" width="700"></p>
 
+This isn't just the UK listing cheaper models. The UK sits below each model's cross-country average in 17 of the 17 models listed there, by $127 on average.
 
-<p align="center">
-  <img src="images_hd/md_data_sample_hd.png" height='auto' width="1500">
-</p>
-<p align="center">
-  <em>We note that all Ultra models are titanium</em>
-</p>
+<p align="center"><img src="images/12_price_deviation_heatmap.png" width="900"></p>
 
-### Summary Statistics
+## Key findings
 
-After cleaning and filtering, we are left with the following spread of data points:
-
-
-<table align="center" width="950">
-  <tr>
-    <td align="center">
-      <h3>Entries</h3>
-      <h1>2,328</h1>
-    </td>
-    <td align="center">
-      <h3>Sellers</h3>
-      <h1>1,430</h1>
-    </td>
-    <td align="center">
-      <h3>Countries</h3>
-      <h1>20</h1>
-    </td>
-    <td align="center">
-      <h3>Models</h3>
-      <h1>18</h1>
-    </td>
-  </tr>
-</table>
-
-
-The vast majority of listings come from the USA, and most watches are Ultra models, which is Apple's flagship family.
-<p align="center">
-  <img src="images_hd/md_country_donut_hd.png" width="460">
-  <img src="images_hd/md_model_by_count_donut_hd.png" width="460">
-</p>
-
-
-
-
-
-Though most watches come from the USA, the low prices in the UK bring the average down.
-<p align="center">
-  <img src="images_hd/md_country_means_hd.png" width="950">
-</p>
-
-Finally, we see that watches are priced about 10% cheaper when sold by individuals, compared with resellers with multiple listings.
-<p align="center">
-  <img src="images_hd/md_listing_type_combined_hd.png" width="950">
-</p>
-<p align="center">
-  <em>The difference in price is statistically significant, with p ≪ 0.05</em>
-</p>
-
-Before going into details about the mathematical model and its construction, we first give an overview of the big ideas, as well as how we will be interpreting the model's results.
-
-## What is SHAP?
-
-SHapley Additive exPlanation(s) was first developed to solve the problem in game theory of how to fairly distribute credit when multiple entities contribute to a project. It is based on the idea of 'synergy' and 'dissonance'. Using features from our data as an example, 'Gold = True' and 'Model = Series 2' will have synergy since most Series 2 watches are gold-plated. In this situation, both will receive a positive dollar score. However 'Gold = True' and 'Model = Ultra 3' are dissonant because none of the Ultra 3s are gold-plated. Thus both will receive a penalty, or negative dollar score in this configuration. In this way, the mathematical model looks at all possible configurations over all the data points and is able to assign positive or negative dollar values to each feature.
-
-Several benefits of using SHAPs vs linear statistics such as the mean are:
-
-1. **SHAPs consider listing volume.**
-   Older, gold-plated watches appear in much lower volumes than newer models, and our data is highly skewed towards Ultra models.
-
-2. **SHAPs account for confounding variables.**
-  It natively handles highly correlated data.
-
-3. **SHAPs work well with high-cardinality features.**
-  There are thousands of individual seller IDs. SHAP is able to quantify the global effect of seller ID.
-
-From a mathematical standpoint, SHAP is the single best way to extract accurate contributions from individual features. Below we will see some examples of how SHAP breaks down the predicted prices of two different smartwatch listings.
-
-
-
-### The SHapley Additive exPlanations Force Plot
-
-
-SHAP breaks down a predicted price into its individual components, showing how each feature raises or lowers the model's prediction.
-For example, the diagram below shows an actual listing and how the model explains its price:
-
-<p align="center">
-  <img src="images_hd/md_shap_force_typical_hd.png" width="1000">
-</p>
-<p align="center">
-  <em>Some forces raise the price, while others lower it</em>
-</p>
-
-
-**Features that increased the predicted price:**
-
-- **Model:** Ultra 3
-- **Condition:** Open Box
-- **Case Size:** 49mm
-- **Country:** USA
-
-
-
-**Features that decreased the predicted price:**
-
-- **Gold:** No
-- **Worldwide Shipping:** No
-- **Premium Band:** No
-
-
-The table below shows the actual SHAP values for this particular listings. The units are in USD, and each SHAP value represents a dollar increase or decrease in predicted price. For example, because the model was Ultra 3, the model predicted a $62.08 increase, and a $7.69 decrease in price because worldwide shipping was not offered. 
-
-<p align="center">
-  <img src="images_hd/md_shap_values_typical_hd.png" width="1000">
-</p>
-<p align="center">
-  <em>SHAP values for a typical Ultra 3 model</em>
-</p>
-
-
-
-**It's important to note that SHAP values will be different for each individual listing.** For comparison, below is the force plot and SHAP values for a gold-plated, Series 2 watch. We see that being gold-plated raises the predicted price by $47.59, while being an older Series 2 model brings the predicted price down by $25.76.
-<p align="center">
-  <img src="images_hd/md_shap_force_series_2_gold_hd.png" width="1000">
-</p>
-<p align="center">
-  <img src="images_hd/md_shap_values_series_2_gold_hd.png" width="1000">
-</p>
-
-
-
-
-To obtain the global ranking of feature importance that we saw in the introduction and will see again in the next section, we took the average of (the absolute value of) each SHAP value for each individual feature across every listing. This gives us an estimation of the magnitude of feature importance.
-
-
-
-
-
-
-
-
-
-## Global Model Results
-#### Data Preprocessing and Model Fitting
-
-We used an 80/20 train-test split. Missing values in the case size column were replaced with the median case size calculated from the training set. We then trained the model CatBoostRegressor using condition, case size, worldwide shipping, country, model, Hermès, cellular, gold, premium band, ceramic, power-seller, and seller ID as predictors of price. We achieved an $R^2$ of 0.53 and a mean absolute error of $69. Both CatBoostRegressor and SHAP functionality are included in the open source Python library CatBoost, which is based on a machine learning algorithm that uses gradient boosting on decision trees.
-
-
-
-
- As we saw in the last section, SHAP values tell us how many dollars the model thinks each feature contributed to price. We can then take the absolute value of each SHAP value across all listings and compute their average. This gives us the ranking of global feature importance that we see below.
-
-  <p align="center">
-  <img src="images_hd/md_SHAP_with_power_seller_hd.png" width="950" height='auto'>
-  </p>
-<p align="center">
-  <em>For example, 'model' changes price by +- $30, on average</em>
-</p>
-
-
-
-### Global Results by Feature
-Let us look at one example of how we can get a more granular global view by looking at the distribution of SHAP values by feature. Let's look at the number two feature, 'country'.
-
-<p align="center">
-  <img src="images_hd/md_shap_distribution_country_hd.png" width="950" height='auto'>
-  </p>
-
-The SHAP values are widely distributed, and this is to be expected, as the individual values will depend highly on the particular listing. However, we notice that there is a cluser of points far to the left of zero. This corresponds to UK listings, which have substantially lower prices, as we'll see below.
-
-
-The following diagram shows deviation from the global average price. Rectangles in blue are priced below average, while rectangles in red are priced above the average.
-<p align="center">
-  <img src="images_hd/md_price_deviation_country_model_hd.png" width="950" height='auto'>
-  </p>
-<p align="center">
-  <em>The UK has substantially cheaper listing prices across all models</em>
-</p>
-
-We note that listings in the UK have consistently lower asking prices across models. 
-
-
-The CatBoost model has recognized this and adjusted the SHAP values for the UK accordingly. Here is a distribution of those SHAP values.
-
-<p align="center">
-  <img src="images_hd/md_shap_uk_distribution_hd.png" width="950" height='auto'>
-  </p>
-<p align="center">
-  <em>The country SHAP values for all UK listings are negative, meaning the model predicted significantly lower prices on the basis of country</em>
-</p>
-This distribution tells us more than the price deviation by model did. It tells us that our model is predicting that <u>all</u> configurations of smartwatches sold in the UK will be underpriced. In fact, it tells us that a product being listed in the UK is a major component of a low list price. 
-
-
-
-
-
-
-
-
-
-## Key Findings
-
-Here we summarize our analyses:
-
-1. **Model is the strongest predictor of list price, though simple comparisons between models can be misleading.**
-
-   Predictably, newer models such as the Ultra 3 have high list prices; however so do some older models, like the Series 2, 3 and 4. Further analysis found that a high percentage of these models are gold-plated. 
-
-2. **The effect of a feature can vary substantially across subsets of the market.**
-
-   Gold-plating is associated with an approximately 150% increase in average list price, yet its overall mean absolute SHAP value is low. This illustrates that a feature can be associated with a large price difference within a particular subset of listings while contributing relatively little to predictions across the overall market.
-
-3. **Country is an important source of variation in list price.**
-
-   Country is the second-most important feature after model. The country-level analysis shows substantial differences in listing prices across markets, particularly in the UK, where listings tend to have substantially lower prices than the corresponding average for similar smartwatch configurations.
-
+1. **Model is the top feature, but simple comparisons mislead.** Series 2, 4 and 3 average more than the Ultra 3, and they have the highest gold-plating shares.
+2. **A feature can matter a lot in a niche and little overall.** Gold-plating goes with a 54.8% within-model premium, yet it ranks only 7th of 12 by mean |SHAP| ($9.37), because it affects just 123 listings.
+3. **Country is a large source of variation.** It ranks 2nd. The UK is below the cross-country average in 17 of 17 models, and the model lowers the prediction for every UK listing.
 
 ## Limitations
 
-1. **Our data contains listings rather than completed sales.**
-  A high listing price does not necessarily indicate that a watch actually sold for that amount, and the data therefore describes asking prices in the secondary market rather than realized resale values.
+1. **Listings, not completed sales.** A high list price doesn't mean a watch sold for that amount.
+2. **Missing variables.** The CSV has 8 columns (brand, condition, case size, country, price, seller ID, worldwide shipping, title). It has no description or sale price, so other product details come from the title alone.
+3. **Web-scraped data quality.** Labels came in mixed languages, and 33 condition/title conflicts needed fixing. Regex extraction can miss features: 65 listings have no detectable model.
 
-2. **Our data contains missing variables.**
-  We are missing key information such as listing description, sale price. A seller cannot generally include every important feature in the title of a listing alone.
+## Future work
 
-3. **Web-scraped data quality**
-  Because the dataset was scraped from online marketplaces, it contains inconsistencies in fields such as condition and country and required substantial cleaning and standardization. Feature engineering also relies on extracting information from listing titles using regular expressions, meaning that some characteristics may not have been identified correctly or may not have been present in the title.
+These are proposals, not findings:
+- Analyze seller ID in more detail: do power sellers over- or under-price?
+- Re-scrape the same marketplaces over time to see how long listings stay up and to estimate sale prices.
 
+## How to reproduce
 
-## Directions for Future Investigation
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+make figures    # regenerate images/ from data/raw/
+make notebook   # execute notebooks/01_plated_in_gold_analysis.ipynb top to bottom
+make app        # rebuild app/data.js
+make serve      # http://localhost:8000
+```
 
-A natural next step would be to continue a more granular analysis on the other features. We could analyse seller id and determine if there is a tendency for power sellers to over- or under- price listings. We could also look at how individual sellers (those with just one listing) tend to price their listings, looking with correlations with other features. 
+```
+├── data/raw/Global_Smartwatch_Marketplace.csv   raw scraped listings
+├── src/            cleaning, features, data loading, CatBoost + SHAP modeling, story metrics, visualization
+├── notebooks/      01_plated_in_gold_analysis.ipynb (final analysis, with outputs)
+├── images/         figures generated by scripts/make_figures.py
+├── app/            interactive site (published by GitHub Pages) + build_data.py + AUDIT.md
+├── scripts/        make_figures.py, check_app.py (headless-browser smoke test)
+└── Makefile, requirements.txt
+```
 
-Another interesting direction would be to do several rounds of web-scraping of the same marketplaces over time. This would give an idea of how long things stay up for, and we could use it to estimate the sales price. 
+Every number in this README is computed by `src/story.py`. `app/AUDIT.md` traces each claim to its source.
 
-
+*License: MIT*
