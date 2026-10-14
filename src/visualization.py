@@ -948,19 +948,6 @@ def fig_waterfall(shap_row, labels, base, title, path=None):
     return _save(fig, path)
 
 
-def fig_country_shap(country, shap_country, path=None):
-    _style()
-    uk = shap_country[country == 'United Kingdom']; other = shap_country[country != 'United Kingdom']
-    fig, ax = plt.subplots(figsize=(8.5, 4.6)); _grid(ax, 'y')
-    bins = np.linspace(shap_country.min(), shap_country.max(), 40)
-    ax.hist(other, bins=bins, color=GRAY, label=f'Other countries (n={len(other):,}, mean {other.mean():+.0f} $)')
-    ax.hist(uk, bins=bins, color=UKC, alpha=.9, label=f'United Kingdom (n={len(uk)}, mean {uk.mean():+.0f} $)')
-    ax.axvline(0, color=INK, lw=1); ax.legend(loc='upper left')
-    ax.set_xlabel('Country SHAP value ($)'); ax.set_ylabel('Listings'); ax.set_title('Country SHAP values: UK vs. other countries')
-    ax.xaxis.set_major_formatter(lambda t, _: f'${t:,.0f}')
-    return _save(fig, path)
-
-
 def fig_deviation_heatmap(df, path=None, min_n=30):
     _style()
     cnt = df['country'].value_counts()

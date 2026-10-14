@@ -29,6 +29,5 @@ ti = df.index.get_loc(st['typical_idx'])
 v.fig_waterfall(st['sv'][ti], [f'{l} = {"missing" if pd.isna(X.iloc[ti][f]) else X.iloc[ti][f]}' for l, f in zip(lab, FEATURES)], st['base'], 'SHAP breakdown: typical US Ultra 3 listing', P('09_shap_typical_ultra3.png'))
 w = st['s2_row'].iloc[0]
 v.fig_waterfall(st['s2_shap'], [f'{l} = {"missing" if pd.isna(w[f]) else w[f]}' for l, f in zip(lab, FEATURES)], st['base'], 'SHAP breakdown: hypothetical gold-plated Series 2', P('10_shap_series2_gold.png'))
-v.fig_country_shap(df['country'].values, st['sv'][:, FEATURES.index('country')], P('11_shap_country_uk.png'))
 v.fig_deviation_heatmap(df, P('12_price_deviation_heatmap.png'))
 print('figures written to', IMAGES_DIR)

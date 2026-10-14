@@ -84,9 +84,7 @@ Features interact. In a hypothetical gold-plated Series 2, *gold = 1* adds $47.5
 
 <p align="center"><img src="images/10_shap_series2_gold.png" width="700"></p>
 
-**The UK effect.** UK listings average $428, against $593 elsewhere (Welch p = 1.8e-52). Their country SHAP values average −$106, against +$9 for other countries, and **212 of 212 UK listings get a negative country SHAP value** (33 of 33 in the test set).
-
-<p align="center"><img src="images/11_shap_country_uk.png" width="700"></p>
+**The UK effect.** UK listings average $428, against $593 elsewhere (Welch p = 1.8e-52). Their country SHAP values average −$106, against +$9 for other countries, and **212 of 212 UK listings get a negative country SHAP value** (33 of 33 in the test set). The price gap itself is visible in the country chart in [Data at a glance](#data-at-a-glance).
 
 This isn't just the UK listing cheaper models. The UK sits below each model's cross-country average in 17 of the 17 models listed there, by $127 on average.
 

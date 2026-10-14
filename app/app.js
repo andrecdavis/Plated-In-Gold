@@ -46,7 +46,7 @@ H('tPros', `<li><b>Reflects listing volume</b> — common models shape the model
 H('tFit', `${D.metrics.n_train.toLocaleString()} train / ${D.metrics.n_test} test listings (80/20 split, seed 43, after dropping rows with missing values). CatBoost regressor with default hyperparameters on condition, case size, worldwide shipping, country, model, Hermès, cellular, gold, premium band, ceramic and seller ID; the ranking chart's variant also includes the power-seller feature (R² ${D.metrics_ps.r2.toFixed(2)}, MAE ${fmt(D.metrics_ps.mae)}).`);
 H('tDist', `Choose a feature to see the spread of its SHAP values across all ${S.entries.toLocaleString()} listings. For <b>country</b>, the cluster left of zero is the UK: UK listings average ${fmt(C.uk_country_shap_mean)}, other countries +${fmt(C.other_country_shap_mean)}.`);
 H('tHeat', `Each cell shows how far a country's average for a model sits from that model's average across countries (blue below, red above). <b>The UK sits below in ${C.uk_models_below} of the ${C.uk_models_total} models it lists</b>, by ${fmt(Math.abs(C.uk_dev_mean))} on average.`);
-H('ukNeg', `Country SHAP values for UK listings: ${D.uk.neg_all} of ${D.uk.n} are negative (${D.uk.neg_test} of ${D.uk.n_test} in the test set) — the model lowers the prediction for being listed in the UK.`);
+H('ukNeg', `In the SHAP chart above (feature: country), UK listings sit left of zero: ${D.uk.neg_all} of ${D.uk.n} UK country SHAP values are negative (${D.uk.neg_test} of ${D.uk.n_test} in the test set) — the model lowers the prediction for being listed in the UK.`);
 H('f1', `${label(C.model_rank_A[0])} has the largest mean |SHAP| (${fmt(imp[0].value)}). The Ultra 3 averages ${fmt(C.ultra3_mean)}, but ${list(C.old_above_ultra3)} average more, and they have the highest gold shares (${list(C.top3_gold.map(m => C.gold_share[m] + '%'))}).`);
 H('f2', `Within models that have gold versions, gold-plating goes with a ${D.gold.pct}% higher average list price, yet gold ranks only ${C.gold_rank} of ${C.n_features} by mean |SHAP| (${fmt(C.gold_mean_abs_shap)}) — a big effect in a small niche (${D.gold.n} listings).`);
 H('f3', `Country ranks #${imp.findIndex(d => d.feature === 'country') + 1}. UK listings average ${fmt(D.uk.uk_mean)} vs ${fmt(D.uk.rest_mean)} elsewhere (Welch p = ${D.uk.p.toExponential(1)}), and the UK is below the cross-country average in ${C.uk_models_below} of ${C.uk_models_total} models.`);
@@ -125,10 +125,6 @@ const dist = () => { const f = $('dFeat').value, i = F.indexOf(f), key = {countr
     fillcolor: 'rgba(0,0,0,0)', line: {color: 'rgba(0,0,0,0)'}, marker: {size: 4, opacity: .5, color: n === 'United Kingdom' ? UKC : [BLUE, OKABE[2], OKABE[3], OKABE[4], GRAY, OKABE[1]][j]}, hovertemplate: '%{x:+$.2f}<br>%{text}<extra></extra>'})),
     lay({title: {text: `SHAP values for '${label(f)}'`, font: {size: 15}}, margin: {l: 120, r: 20, t: 40, b: 40}, showlegend: false, xaxis: {title: 'SHAP value ($)', zeroline: true}}), cfg); };
 $('dFeat').onchange = dist; dist();
-const uk = L.filter(r => r.k === 'United Kingdom').map(r => r.shap[ci]);
-const drawUK = () => Plotly.react('ukHist', [{type: 'histogram', x: uk, marker: {color: UKC}, hovertemplate: '%{x}: %{y} listings<extra></extra>'}],
-  lay({title: {text: 'Country SHAP values, UK listings', font: {size: 15}}, xaxis: {title: 'Country SHAP value ($)', tickprefix: '$'}, yaxis: {title: 'Listings'}, bargap: .05}), cfg);
-drawUK();
 
 // ---------- per-listing waterfall explorer
 $('eModel').innerHTML = MODELS.map(m => `<option>${m}</option>`).join('');
@@ -158,4 +154,4 @@ document.querySelectorAll('.presets button').forEach(b => b.onclick = () => pres
 
 // ---------- theme toggle: re-theme every chart
 $('themeToggle').onclick = () => { applyTheme(theme === 'dark' ? 'light' : 'dark'); localStorage.setItem('theme', theme);
-  render(); dist(); drawImp($('impPS').checked); drawUK(); if (lastListing) showListing(lastListing); };
+  render(); dist(); drawImp($('impPS').checked); if (lastListing) showListing(lastListing); };
