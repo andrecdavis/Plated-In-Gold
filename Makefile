@@ -12,7 +12,8 @@ data:            ## sanity-check the cleaned dataset
 figures:         ## regenerate images/
 	$(PY) scripts/make_figures.py
 
-notebook:        ## execute the final notebook in place
+notebook:        ## generate and execute the analysis notebook
+	$(PY) scripts/make_notebook.py
 	cd notebooks && $(PY) -m jupyter nbconvert --to notebook --execute --inplace 01_plated_in_gold_analysis.ipynb
 
 app:             ## rebuild app/data.js
