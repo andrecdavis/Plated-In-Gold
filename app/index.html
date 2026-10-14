@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plated in Gold — What Drives Apple Smartwatch Resale Prices?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="data.js"></script>
+<link rel="stylesheet" href="style.css">
+</head><body>
+<nav id="toc"><span class="brand">◆ Plated in Gold</span>
+<a href="#intro">Intro</a><a href="#glance">Data at a glance</a><a href="#pitfall">The gold pitfall</a><a href="#model">Modeling</a><a href="#shap">SHAP</a><a href="#findings">Key findings</a><a href="#limits">Limitations</a><a href="#future">Future work</a></nav>
+<header class="hero" id="intro"><div class="wrap">
+<p class="eyebrow">A data story · Apple Watch resale listings</p>
+<h1>Plated in <span class="gold">Gold</span></h1>
+<h2>What drives Apple smartwatch resale prices?</h2>
+<p class="lede">We analyze <b id="tN"></b> third-party Apple smartwatch listings, web-scraped from online marketplaces, to provide a snapshot of the market and learn which factors are most associated with list price. From the title we use regex to extract the model, premium markers like Hermès editions and materials like titanium and ceramic, and aftermarket additions such as <b>24k gold plating</b>.</p>
+<p class="caveat"><b>The largest caveat:</b> these are <em>list prices</em>, not completed transactions — but they still show which product, seller and geographic characteristics are associated with higher or lower asking prices.</p>
+</div></header>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="wrap" id="question"><h3>The question</h3><p>Which product, seller and geographic factors are associated with higher or lower Apple Watch asking prices on resale marketplaces?</p></section>
+<div class="filters" id="filters"><div class="wrap fl">
+<strong>Filter the market charts ▸</strong>
+<label>Country <select id="fCountry"></select></label>
+<label>Family <select id="fFamily"></select></label>
+<label>Condition <select id="fCond"></select></label>
+<label>Listing type <select id="fType"><option value="">All</option><option value="0">Individual (1 listing)</option><option value="1">Power seller (2+ listings)</option></select></label>
+<label class="chk"><input type="checkbox" id="fGold"> Hide gold-plated</label>
+<span id="fCount" class="pill"></span><button id="fReset">Reset</button></div></div>
+<section class="wrap" id="glance"><h3>The data at a glance</h3>
+<p>The raw data (<span id="rawRows"></span> rows) includes other brands; Apple accounts for <b id="appleShare"></b> of listings. <span id="tClean"></span></p>
+<div class="cards" id="cards"></div>
+<p id="tMix"></p>
+<div class="grid2"><div id="countryDonut" class="chart"></div><div id="modelDonut" class="chart"></div></div>
+<p id="tUKavg"></p>
+<div id="countryMeans" class="chart"></div>
+<p id="listingTxt"></p>
+<div id="listingChart" class="chart"></div>
+<h4>Price explorer</h4><p>Every dot is a listing (current filters applied). Hover to read the title.</p>
+<div id="scatter" class="chart tall"></div></section>
+<section class="wrap" id="pitfall"><h3>The gold-plating pitfall</h3>
+<p id="tPit"></p>
+<div id="modelChart" class="chart tall"></div><p class="cap">Average list price by model. Gold = current generation (Ultra 3, Series 11, SE 3).</p>
+<div class="callout"><div class="big" id="goldPct"></div><div><span id="goldTxt"></span></div></div>
+<div id="goldChart" class="chart tall"></div><p class="cap">Share of listings that are gold-plated (title mentions 24k / 24ct / 24 karat), by model.</p>
+<p id="tGold2"></p></section>
+<section class="wrap" id="model"><h3>Modeling: CatBoost price model</h3>
+<p id="tFit"></p>
+<div class="cards" id="mcards"></div>
+</section>
+<section class="wrap" id="shap"><h3>Explaining the model with SHAP</h3>
+<p>SHAP comes from game theory: how to fairly distribute credit when many players contribute. For each listing it splits the gap between the model's average prediction and that listing's prediction into a positive or negative dollar amount per feature, averaging over the possible orderings in which features are added. <span id="tSyn"></span></p>
+<ol class="pros" id="tPros"></ol>
+<h4>Global feature ranking</h4>
+<p>A CatBoost regressor plus SHapley Additive exPlanations (SHAP) ranks features by how many dollars they move the predicted price, on average. <span id="tRank"></span> <span class="note" id="impNote"></span></p>
+<label class="inline"><input type="checkbox" id="impPS" checked> Include power_seller feature (README chart)</label><div id="impChart" class="chart"></div><p class="cap">Mean |SHAP| in USD over the held-out test listings. Bigger bar = greater impact. Hover for values.</p>
+<h4>Two listings, explained</h4>
+<p>Pick a listing and see how each feature pushes the prediction up (gold) or down (blue) from the model's base value (average training prediction) of <b id="baseVal"></b>.</p>
+<div class="explorer"><div class="ctrl">
+<div class="presets"><button data-p="ultra">Typical Ultra 3</button><button data-p="s2gold">Series 2 gold</button><button data-p="uk">A UK listing</button><button data-p="rand">Random</button></div>
+<label>Model <select id="eModel"></select></label>
+<label>Listing <select id="eList"></select></label>
+<div id="eInfo" class="info"></div></div>
+<div id="waterfall" class="chart tall"></div></div>
+<p class="cap">Explorer values use the 11-feature model (no power_seller), the one behind the README examples. Global importance = mean |SHAP| over the test set.</p><h4>Global results by feature</h4>
+<p id="tDist"></p>
+<label class="inline">Feature <select id="dFeat"></select></label>
+<div id="shapDist" class="chart"></div>
+<p id="tHeat"></p>
+<div id="heatmap" class="chart tall"></div>
+<div id="ukHist" class="chart"></div>
+<p class="cap" id="ukNeg"></p></section>
+<section class="wrap" id="findings"><h3>Key findings</h3><div class="findings">
+<div><span>1</span><h5>Model is the top feature — but simple comparisons mislead.</h5><p id="f1"></p></div>
+<div><span>2</span><h5>A feature's effect varies across the market.</h5><p id="f2"></p></div>
+<div><span>3</span><h5>Country is a large source of variation.</h5><p id="f3"></p></div></div></section>
+
+<section class="wrap" id="limits"><h3>Limitations</h3><ul>
+<li><b>Listings, not completed sales.</b> The data has asking prices only; a high list price doesn't mean a watch sold for that amount.</li>
+<li id="tMissing"></li>
+<li id="tQuality"></li></ul>
+</section><section class="wrap" id="future"><h3>Future work</h3><p>These are proposals, not findings: analyze seller ID more granularly (do power sellers over- or under-price?) and re-scrape the same marketplaces over time to see how long listings stay up and estimate sale prices.</p></section>
+<footer><div class="wrap"><a href="https://github.com/andrecdavis/Plated-In-Gold" style="color:var(--gold2)">Source on GitHub</a> · Built from <code>Global_Smartwatch_Marketplace.csv</code> · numbers recomputed by <code>build_data.py</code> with the project's own src/ pipeline (Notebooks/CatBoost model.ipynb).</div></footer>
+<script src="app.js"></script></body></html>

@@ -1,0 +1,31 @@
+:root{--gold:#c9a24a;--gold2:#e8c874;--ink:#1d1b17;--mut:#6b655a;--bg:#fbf8f1;--card:#fff;--blue:#4a78b5}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.65 Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 22px}section.wrap{padding-top:56px;padding-bottom:12px}
+nav#toc{position:sticky;top:0;z-index:20;background:#15130fe8;backdrop-filter:blur(6px);display:flex;gap:18px;align-items:center;padding:10px 22px;overflow-x:auto;white-space:nowrap}
+nav a{color:#e9dfc8;text-decoration:none;font-size:14px}nav a:hover{color:var(--gold2)}.brand{color:var(--gold2);font-family:'Playfair Display',serif;font-weight:800;margin-right:8px}
+.hero{background:radial-gradient(ellipse at 70% 0%,#3a2f17 0,#15130f 60%);color:#f3ead6;padding:90px 0 70px}
+.eyebrow{letter-spacing:.18em;text-transform:uppercase;font-size:12px;color:var(--gold2)}
+h1{font-family:'Playfair Display',serif;font-size:clamp(44px,8vw,86px);margin:.1em 0 0;line-height:1}
+.gold{background:linear-gradient(100deg,#b8892f,#f5dc8e 45%,#b8892f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h2{font-weight:500;font-size:clamp(20px,3vw,28px);margin:.3em 0 1em;color:#e9dfc8}.lede{max-width:720px;font-size:18px}
+.caveat{max-width:720px;border-left:3px solid var(--gold);padding:8px 14px;background:#ffffff10}
+h3{font-family:'Playfair Display',serif;font-size:32px;margin:0 0 .4em;border-bottom:2px solid var(--gold);display:inline-block}h4{font-size:20px;margin:1.6em 0 .2em}
+.chart{width:100%;height:380px;background:var(--card);border-radius:14px;box-shadow:0 2px 14px #0000000d;margin:12px 0}.chart.tall{height:520px}
+.cap{color:var(--mut);font-size:13px;text-align:center;font-style:italic;margin-top:-4px}
+.filters{position:sticky;top:44px;z-index:15;background:#fffaf0f2;border-bottom:1px solid #e8dcc0;box-shadow:0 2px 10px #0000000a;padding:8px 0;margin-top:30px}
+.fl{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;font-size:14px}
+select,button{font:inherit;font-size:14px;padding:5px 8px;border:1px solid #d8c9a3;border-radius:8px;background:#fff}button{cursor:pointer;background:var(--ink);color:#f3ead6;border:none}button:hover{background:var(--gold);color:var(--ink)}
+.pill{background:var(--gold);color:#1d1b17;border-radius:20px;padding:2px 10px;font-weight:600}
+.callout{display:flex;gap:20px;align-items:center;background:linear-gradient(90deg,#fff6df,#fff);border:1px solid #ecd9a6;border-radius:14px;padding:18px 22px}
+.big{font-family:'Playfair Display',serif;font-size:46px;font-weight:800;color:#a8802c;white-space:nowrap}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:18px 0}
+.cards div{background:var(--card);border-radius:14px;padding:16px;text-align:center;box-shadow:0 2px 14px #0000000d;border-top:4px solid var(--gold)}
+.cards b{display:block;font-family:'Playfair Display',serif;font-size:34px}.cards small{color:var(--mut);text-transform:uppercase;letter-spacing:.1em;font-size:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.explorer{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}.ctrl label{display:block;margin:10px 0;font-size:14px}.ctrl select{width:100%}
+.presets{display:flex;flex-wrap:wrap;gap:6px}.info{font-size:14px;background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 14px #0000000d}
+.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.findings>div{background:#fff;border-radius:14px;padding:18px;position:relative;box-shadow:0 2px 14px #0000000d}
+.findings span{position:absolute;top:-14px;left:16px;background:var(--gold);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700}
+h5{font-size:17px;margin:.4em 0}.pros li{margin:.3em 0}.inline{font-size:14px}.note{color:var(--mut);font-size:14px}
+footer{margin-top:60px;padding:26px 0;background:#15130f;color:#bfb49c;font-size:13px}
+@media(max-width:760px){.grid2,.explorer{grid-template-columns:1fr}.chart.tall{height:440px}.filters{top:40px}.callout{flex-direction:column;align-items:flex-start}h3{font-size:26px}}
