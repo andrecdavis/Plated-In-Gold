@@ -19,7 +19,7 @@ s2gold = dict(values={k: (str(v) if k in CAT_FEATURES else (None if pd.isna(v) e
 
 listings = []
 for j, (i, r) in enumerate(df.iterrows()):
-    listings.append(dict(t=str(r['title'])[:110], m=r['model'] if pd.notna(r['model']) else 'Unknown', f=r['family'] or '',
+    listings.append(dict(t=str(r['title'])[:110], m=r['model'] if pd.notna(r['model']) else 'Unknown', f=r['family'] if isinstance(r['family'], str) else 'Unknown',
         c=r['condition'] if pd.notna(r['condition']) else 'Missing', k=r['country'], p=r2(r['price']),
         s=None if pd.isna(r['case_size']) else int(r['case_size']), g=int(r['gold']), h=int(r['hermes']),
         ps=int(r['power_seller']), cel=int(r['cellular']), w=int(r['worldwide_shipping']), sid=r['seller_id'],
