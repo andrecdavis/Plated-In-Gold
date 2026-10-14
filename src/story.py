@@ -69,7 +69,7 @@ def compute_story(raw, df):
         n_sellers=int(df.seller_id.nunique()),
         cond_changed_n=int((df['condition'] != raw.loc[df.index, 'condition'].replace(
             {'Nuevo': 'New', 'Usado': 'Used', 'Caja abierta': 'Open box', 'New other': 'New', '--': 'Unknown'})).sum()),
-        country_translated_n=int(raw.loc[df.index, 'Country'].isin(['Corea del Sur', 'Reino Unido', 'Estados Unidos']).sum()),
+        country_translated_n=int(raw.loc[df.index, 'Country'].isin(['Corea del Sur', 'Reino Unido', 'Estados Unidos', 'Italia']).sum()),
         apple_removed_by_cleaning=int(len(apple) - len(df)),
         parts_kept_n=int((df['condition'] == 'For parts or not working').sum()),
         std_means={m: r2(mm_std[m]) for m in ['Series 2', 'Series 3', 'Series 4', 'Ultra 3', 'Series 11'] if m in mm_std},

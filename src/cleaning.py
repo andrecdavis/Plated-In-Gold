@@ -87,10 +87,12 @@ def standardize_country(df):
     country_map = {
     'Corea del Sur':'South Korea',
     'Reino Unido':'United Kingdom',
-    'Estados Unidos':'United States'
+    'Estados Unidos':'United States',
+    'Italia':'Italy'
     }
 
-    df['country'] = df['Country'].map(country_map).fillna(df['Country'])
+    country = df['Country'].str.strip()
+    df['country'] = country.map(country_map).fillna(country)
     
     return df
 

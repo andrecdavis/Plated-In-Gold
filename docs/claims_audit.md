@@ -24,8 +24,8 @@ Status: ✅ supported as written · ✏️ rewritten to match data/model · ❌ 
 | 14 | Gold pitfall | 0 current-gen listings gold-plated (was "no current-gen") | 0 | `claims.current_gen_gold_n` | ✏️ stated as count |
 | 15 | Gold pitfall | without gold, Series 2 & 3 still above Series 11 | $615, $575 vs $569 | `claims.std_means`, `claims.std_old_above_s11` | ✏️ (replaces "doesn't completely resolve") |
 | 16 | Glance | raw rows; Apple share | 3,607; 65.7% | `summary.raw_rows`, `summary.apple_share` | ✅ |
-| 17 | Glance | cleaning steps | 7 country labels mapped, >$2,000 dropped, 42 Apple rows dropped, 33 conditions changed, 6 "for parts" kept | `claims.country_translated_n`, `max_price_rule`, `apple_removed_by_cleaning`, `cond_changed_n`, `parts_kept_n`; `src/cleaning.py` | ✏️ ("translated listings" & "removed broken-for-parts lots" not in code → removed) |
-| 18 | Glance | cards: entries / sellers / countries / models | 2,328 / 1,430 / 20 / 18 | `summary.*` | ✅ |
+| 17 | Glance | cleaning steps | 8 country labels mapped, >$2,000 dropped, 42 Apple rows dropped, 33 conditions changed, 6 "for parts" kept | `claims.country_translated_n`, `max_price_rule`, `apple_removed_by_cleaning`, `cond_changed_n`, `parts_kept_n`; `src/cleaning.py` | ✏️ ("translated listings" & "removed broken-for-parts lots" not in code → removed) |
+| 18 | Glance | cards: entries / sellers / countries / models | 2,328 / 1,430 / 19 / 18 (19 after mapping "Italia" → Italy; was 20) | `summary.*` | ✏️ |
 | 19 | Glance | USA share; UK next | 77.4%; 9.1% | `claims.us_share`, `claims.uk_share` | ✏️ (was "vast majority") |
 | 20 | Glance | Ultra share (was "most watches are Ultra") | 50.0% (Series 46.8%) | `claims.ultra_share`, `claims.series_share` | ✏️ |
 | 21 | Glance | UK lowest average (30+ listings); excluding UK raises mean | $578 → $593 | `claims.uk_lowest`, `claims.mean_all`, `claims.mean_ex_uk` | ✅ |

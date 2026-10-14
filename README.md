@@ -30,7 +30,7 @@ The raw file has 3,607 listings across several brands, and Apple accounts for 65
 
 | Entries | Sellers | Countries | Models |
 |:-:|:-:|:-:|:-:|
-| **2,328** | **1,430** | **20** | **18** |
+| **2,328** | **1,430** | **19** | **18** |
 
 77.4% of listings come from the USA, and the UK is next at 9.1%. Among listings with an identifiable model family, half (50.0%) are Ultra, Apple's flagship family, and 46.8% are Series.
 
