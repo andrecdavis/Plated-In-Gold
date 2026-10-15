@@ -51,7 +51,7 @@ Status: ✅ supported as written · ✏️ rewritten to match data/model · ❌ 
 | 41 | Findings 3 | country #2; UK $428 vs $593, p=1.8e-52; 17/17 models | — | `importance`, `uk.*`, `claims.*` | ✏️ ("important" → "large source of variation", with numbers) |
 | 42 | Limitations | 8 CSV columns, no description/sale price | 8 | `claims.csv_columns` | ✅ |
 | 43 | Limitations | 33 condition/title conflicts; 65 listings without detectable model | 33; 65 | `claims.cond_changed_n`; `summary.entries − Σ claims.model_n` | ✏️ (quantified) |
-| 44 | Future | proposals labelled as proposals, not findings | — | — | ✏️ |
+| 44 | Future | future-work items stated as next steps (no findings claimed) | — | — | ✏️ |
 | 45 | Charts | all charts/heatmap/filters computed live from `listings` | — | `listings[]` | ✅ |
 | 46 | README | Same claims as rows 1–45, quoted with the same values; figures in `images/` come from `scripts/make_figures.py` | — | `src.story.compute_story`, `src.visualization.fig_*` | ✅ |
 | 47 | App | Section order changed to match the README (data → pitfall → modeling → SHAP); no claims added | — | `app/index.html` | ✏️ |

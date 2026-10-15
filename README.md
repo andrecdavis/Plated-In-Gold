@@ -106,7 +106,6 @@ Features interact. In a hypothetical gold-plated Series 2, *gold = 1* adds $47.5
 
 ## Future work
 
-These are proposals, not findings:
 - Analyze seller ID in more detail: do power sellers over- or under-price?
 - Re-scrape the same marketplaces over time to see how long listings stay up and to estimate sale prices.
 
