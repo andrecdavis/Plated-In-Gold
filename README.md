@@ -9,7 +9,7 @@ We analyze **2,328** third-party Apple Watch listings, web-scraped from online m
 > **The largest caveat:** these are *list prices*, not completed sales. They describe what sellers ask, not what buyers pay.
 
 ## Contents
-1. [Data at a glance](#data-at-a-glance) (incl. [The UK effect](#the-uk-effect))
+1. [Data at a glance](#data-at-a-glance)
 2. [The gold-plating pitfall](#the-gold-plating-pitfall)
 3. [Modeling: CatBoost](#modeling-catboost)
 4. [Explaining the model with SHAP](#explaining-the-model-with-shap)
