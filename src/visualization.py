@@ -943,8 +943,10 @@ def fig_waterfall(shap_row, labels, base, title, path=None):
     ax.set_xlabel(f'Predicted list price ($): base \\${base:,.0f} → prediction \\${x:,.0f}')
     ax.xaxis.set_major_formatter(lambda t, _: f'${t:,.0f}')
     from matplotlib.patches import Patch as _P
-    ax.legend(handles=[_P(color=POS, label='Raises prediction'), _P(color=NEG, label='Lowers prediction')], loc='lower right')
-    ax.set_title(title)
+    # Legend above the axes (under the title) so it never covers bars, prediction line, or xlabel
+    ax.legend(handles=[_P(color=POS, label='Raises prediction'), _P(color=NEG, label='Lowers prediction')],
+              loc='lower center', bbox_to_anchor=(0.5, 1.04), ncol=2, fontsize=10, frameon=False)
+    ax.set_title(title, pad=34)
     return _save(fig, path)
 
 

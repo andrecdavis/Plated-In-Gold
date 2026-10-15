@@ -137,11 +137,21 @@ function showListing(r) {
   r = r || L[+$('eList').value]; if (!r) return; lastListing = r;
   const vals = {condition: r.c, case_size: r.s ? r.s + 'mm' : 'missing', cellular: r.cel ? 'Yes' : 'No', hermes: r.h ? 'Yes' : 'No', worldwide_shipping: r.w ? 'Yes' : 'No', country: r.k, model: r.m, gold: r.g ? 'Yes' : 'No', hermes: r.h ? 'Yes' : 'No', power_seller: r.ps ? 'Yes' : 'No', seller_id: r.sid};
   const o = F.map((f, i) => ({f, v: r.shap[i]})).sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
-  Plotly.react('waterfall', [{type: 'waterfall', orientation: 'h', measure: ['absolute', ...o.map(() => 'relative'), 'total'],
-    y: ['Average prediction', ...o.map(d => `${label(d.f)} = ${vals[d.f] ?? ''}`), 'Predicted price'], x: [D.base, ...o.map(d => d.v), r.pred],
-    text: [fmt(D.base), ...o.map(d => (d.v >= 0 ? '+' : '−') + '$' + Math.abs(d.v).toFixed(2)), fmt(r.pred)], textposition: 'outside',
-    increasing: {marker: {color: POS}}, decreasing: {marker: {color: NEG}}, totals: {marker: {color: INK}}, connector: {line: {color: '#ccc'}}, hovertemplate: '%{y}: %{text}<extra></extra>'}],
-    lay({margin: {l: 230, r: 60, t: 20, b: 40}, yaxis: {autorange: 'reversed'}, xaxis: {tickprefix: '$', range: [Math.min(D.base, r.pred) - 160, Math.max(D.base, r.pred) + 160]}}), cfg);
+  Plotly.react('waterfall', [
+    {type: 'waterfall', orientation: 'h', measure: ['absolute', ...o.map(() => 'relative'), 'total'],
+      y: ['Average prediction', ...o.map(d => `${label(d.f)} = ${vals[d.f] ?? ''}`), 'Predicted price'], x: [D.base, ...o.map(d => d.v), r.pred],
+      text: [fmt(D.base), ...o.map(d => (d.v >= 0 ? '+' : '−') + '$' + Math.abs(d.v).toFixed(2)), fmt(r.pred)], textposition: 'outside',
+      increasing: {marker: {color: POS}}, decreasing: {marker: {color: NEG}}, totals: {marker: {color: INK}},
+      connector: {line: {color: '#ccc'}}, hovertemplate: '%{y}: %{text}<extra></extra>', showlegend: false},
+    // Dummy traces so the legend can say Raises / Lowers (waterfall only exposes a useless "trace 0" entry)
+    {type: 'scatter', x: [null], y: [null], mode: 'markers', marker: {symbol: 'square', size: 11, color: POS},
+      name: 'Raises prediction', hoverinfo: 'skip', showlegend: true},
+    {type: 'scatter', x: [null], y: [null], mode: 'markers', marker: {symbol: 'square', size: 11, color: NEG},
+      name: 'Lowers prediction', hoverinfo: 'skip', showlegend: true}],
+    lay({margin: {l: 230, r: 60, t: 56, b: 40}, yaxis: {autorange: 'reversed'},
+      xaxis: {tickprefix: '$', range: [Math.min(D.base, r.pred) - 160, Math.max(D.base, r.pred) + 160]},
+      showlegend: true,
+      legend: {orientation: 'h', x: 0.5, xanchor: 'center', y: 1.12, yanchor: 'bottom', font: {size: 12}, bgcolor: 'rgba(0,0,0,0)'}}), cfg);
   $('eInfo').innerHTML = `<b>${r.t}</b><br>${r.synth ? 'Hypothetical listing' : 'List price <b>' + fmt(r.p) + '</b>'} · model predicts <b>${fmt(r.pred)}</b><br>${r.k} · ${r.c} · seller ${r.sid}${r.te ? ' · <i>held-out test listing</i>' : ''}`;
 }
 $('eModel').onchange = () => fillList(); $('eList').onchange = showListing;
