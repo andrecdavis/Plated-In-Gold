@@ -28,6 +28,9 @@ viz.fig_donut(df['country'].value_counts(), 'Listings by country', IMAGES_DIR/'0
 viz.fig_donut(df['family'].fillna('Unknown').value_counts(), 'Listings by family', IMAGES_DIR/'02_family_donut.png'); plt.show()""")
 code("""print(f"overall mean ${C['mean_all']} | excluding UK ${C['mean_ex_uk']} | UK lowest (30+ listings): {C['uk_lowest']}")
 viz.fig_country_means(df, IMAGES_DIR/'03_country_means.png'); plt.show()""")
+md("### The UK effect\nUK listings average less than listings elsewhere, and the gap holds within models: the heatmap shows each country's deviation from the model's cross-country average.")
+code("""print(st['uk']); print('UK models below cross-country mean:', C['uk_models_below'], 'of', C['uk_models_total'])
+viz.fig_deviation_heatmap(df, IMAGES_DIR/'12_price_deviation_heatmap.png'); plt.show()""")
 code("""print(st['listing'])
 viz.fig_listing_type(df, IMAGES_DIR/'04_listing_type.png'); plt.show()""")
 md("## 3. The gold-plating pitfall")
@@ -49,8 +52,7 @@ viz.fig_waterfall(st['sv'][ti], [f'{l} = {"missing" if pd.isna(X.iloc[ti][f]) el
 code("""w = st['s2_row'].iloc[0]
 print('Series 2 gold: gold', C['s2_gold_shap'], '| model', C['s2_model_shap'])
 viz.fig_waterfall(st['s2_shap'], [f'{l} = {"missing" if pd.isna(w[f]) else w[f]}' for l, f in zip(lab, FEATURES)], st['base'], 'SHAP breakdown: hypothetical gold-plated Series 2', IMAGES_DIR/'10_shap_series2_gold.png'); plt.show()""")
-code("""print(st['uk']); print('UK models below cross-country mean:', C['uk_models_below'], 'of', C['uk_models_total'])
-viz.fig_deviation_heatmap(df, IMAGES_DIR/'12_price_deviation_heatmap.png'); plt.show()""")
+code("""print('UK negative country SHAP:', st['uk']['neg_all'], 'of', st['uk']['n'], '| test', st['uk']['neg_test'], 'of', st['uk']['n_test'])""")
 md("## 6. Key findings\n1. **Model is the top feature, but raw averages mislead:** Series 2, 4 and 3 average more than the Ultra 3, and they have the highest gold-plating shares.\n2. **Big niche effect, small global effect:** gold-plating carries a ~55% within-model premium but ranks 7th of 12 by mean |SHAP|.\n3. **Country is a large source of variation:** UK listings sit below the cross-country mean in 17 of the 17 models listed there, and 212 of 212 UK listings get a negative country SHAP value.")
 nb['cells']=C; nb.metadata['kernelspec']={'name':'python3','display_name':'Python 3','language':'python'}
 nbf.write(nb, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'notebooks', '01_plated_in_gold_analysis.ipynb'))

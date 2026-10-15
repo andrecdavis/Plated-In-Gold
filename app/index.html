@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="style.css">
 </head><body>
 <nav id="toc"><span class="brand">Plated in Gold</span><button id="themeToggle" class="theme" type="button" aria-pressed="false">☾ Dark mode</button>
-<a href="#intro">Intro</a><a href="#glance">Data at a glance</a><a href="#pitfall">The gold pitfall</a><a href="#model">Modeling</a><a href="#shap">SHAP</a><a href="#findings">Key findings</a><a href="#limits">Limitations</a><a href="#future">Future work</a></nav>
+<a href="#intro">Intro</a><a href="#glance">Data at a glance</a><a href="#uk">UK effect</a><a href="#pitfall">The gold pitfall</a><a href="#model">Modeling</a><a href="#shap">SHAP</a><a href="#findings">Key findings</a><a href="#limits">Limitations</a><a href="#future">Future work</a></nav>
 <header class="hero" id="intro"><div class="wrap">
 <p class="eyebrow">A data story · Apple Watch resale listings</p>
 <h1>Plated in Gold</h1>
@@ -44,6 +44,10 @@
 <div class="grid2"><div id="countryDonut" class="chart donut"></div><div id="modelDonut" class="chart donut"></div></div>
 <p id="tUKavg"></p>
 <div id="countryMeans" class="chart"></div>
+<h4 id="uk">The UK effect</h4>
+<p id="tUK"></p>
+<p id="tHeat"></p>
+<div id="heatmap" class="chart tall"></div>
 <p id="listingTxt"></p>
 <div id="listingChart" class="chart"></div>
 <h4>Price explorer</h4><p>Every dot is a listing (current filters applied); gold dots are gold-plated listings. Hover to read the title.</p>
@@ -76,8 +80,6 @@
 <p id="tDist"></p>
 <label class="inline">Feature <select id="dFeat"></select></label>
 <div id="shapDist" class="chart"></div>
-<p id="tHeat"></p>
-<div id="heatmap" class="chart tall"></div>
 <p id="ukNeg"></p></section>
 <section class="wrap" id="findings"><h3>Key findings</h3><div class="findings">
 <div><span>1</span><h5>Model is the top feature — but simple comparisons mislead.</h5><p id="f1"></p></div>

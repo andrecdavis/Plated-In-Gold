@@ -2,7 +2,7 @@
 
 Every sentence with a number in the app is generated in `app.js` from `window.STORY_DATA` (`app/data.js`). `app/build_data.py` builds that file by calling `src.story.compute_story()`, which uses `src.data.load_clean()` (cleaning in `src/cleaning.py`, features in `src/features.py`) and `src.modeling` (CatBoost settings from the original CatBoost notebook). The README and `notebooks/01_plated_in_gold_analysis.ipynb` quote the same values. Keys below refer to the `compute_story()` output: `summary.*`, `claims.*`, `gold.*`, `listing.*`, `uk.*`, `metrics*`, `importance*`, `s2gold`.
 
-**Section order (README, notebook and app):** Intro & question → Data at a glance → Gold-plating pitfall → Modeling (CatBoost) → SHAP (global ranking, two listings explained, results by feature / UK effect) → Key findings → Limitations → Future work.
+**Section order (README, notebook and app):** Intro & question → Data at a glance (incl. the UK effect: UK price gap + country × model deviation heatmap, placed right after the average-price-by-country chart and before listing type) → Gold-plating pitfall → Modeling (CatBoost) → SHAP (global ranking, two listings explained, results by feature, incl. the UK country-SHAP sentence) → Key findings → Limitations → Future work.
 
 Status: ✅ supported as written · ✏️ rewritten to match data/model · ❌ removed.
 
@@ -29,6 +29,7 @@ Status: ✅ supported as written · ✏️ rewritten to match data/model · ❌ 
 | 19 | Glance | USA share; UK next | 77.4%; 9.1% | `claims.us_share`, `claims.uk_share` | ✏️ (was "vast majority") |
 | 20 | Glance | Ultra share (was "most watches are Ultra") | 50.0% (Series 46.8%) | `claims.ultra_share`, `claims.series_share` | ✏️ |
 | 21 | Glance | UK lowest average (30+ listings); excluding UK raises mean | $578 → $593 | `claims.uk_lowest`, `claims.mean_all`, `claims.mean_ex_uk` | ✅ |
+| 37 | Glance / UK effect | README "UK cheaper across all models" → UK below in 17 of 17 models it lists, avg −$126 (−$126.30; was −$127 before the Italia → Italy mapping) | 17/17 | `claims.uk_models_below`, `uk_models_total`, `uk_dev_mean` | ✏️ stated as count |
 | 22 | Glance | individuals 5.8% cheaper than power sellers (2+); p | $561 vs $596; p=5.1e-8 | `listing.*` (power_seller ≥2, Welch t-test) | ✏️ (README "10%") |
 | 23 | Glance | README "about 10% cheaper" | — | contradicted by `listing.pct_cheaper` | ❌ removed |
 | 24 | Glance | power_seller rank 11/12, ±$3 | 2.83 | `importance` | ✅ new |
@@ -44,7 +45,6 @@ Status: ✅ supported as written · ✏️ rewritten to match data/model · ❌ 
 | 34 | Modeling / SHAP | train/test 1,585/397; R² 0.53; MAE $69 | 0.5297 / $69.40 | `metrics` (11-feature) | ✅ |
 | 35 | Modeling / SHAP | power_seller variant R² 0.52, MAE $70 | 0.5248 / $70.02 | `metrics_ps` | ✅ |
 | 36 | Modeling / SHAP | country cluster left of zero is UK; UK mean country SHAP vs others | −$106 vs +$9; UK = 98% of the 212 lowest | `claims.uk_country_shap_mean`, `other_country_shap_mean`, `uk_share_of_lowest_country_shap` | ✅ |
-| 37 | Modeling / SHAP | README "UK cheaper across all models" → UK below in 17 of 17 models it lists, avg −$127 | 17/17 | `claims.uk_models_below`, `uk_models_total`, `uk_dev_mean` | ✏️ stated as count |
 | 38 | Modeling / SHAP | UK country SHAP negative: 212/212 (33/33 test) | — | `uk.neg_all`, `uk.neg_test` | ✏️ stated as count (was "all") |
 | 39 | Findings 1 | model top feature; Series 2/4/3 above Ultra 3 with highest gold shares 88/51/42% | — | `importance`, `claims.*` | ✏️ ("strongest predictor" → "top feature") |
 | 40 | Findings 2 | gold +54.8% but rank 7/12, mean \|SHAP\| $9 | — | `gold.pct`, `claims.gold_rank`, `gold_mean_abs_shap` | ✏️ |
@@ -55,3 +55,4 @@ Status: ✅ supported as written · ✏️ rewritten to match data/model · ❌ 
 | 45 | Charts | all charts/heatmap/filters computed live from `listings` | — | `listings[]` | ✅ |
 | 46 | README | Same claims as rows 1–45, quoted with the same values; figures in `images/` come from `scripts/make_figures.py` | — | `src.story.compute_story`, `src.visualization.fig_*` | ✅ |
 | 47 | App | Section order changed to match the README (data → pitfall → modeling → SHAP); no claims added | — | `app/index.html` | ✏️ |
+| 48 | README / notebook / app | UK effect (price gap, heatmap) moved into Data at a glance after the country chart; the UK SHAP sentence stays in SHAP; no claims added | — | `README.md`, `scripts/make_notebook.py`, `app/index.html` | ✏️ |

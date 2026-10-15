@@ -9,7 +9,7 @@ We analyze **2,328** third-party Apple Watch listings, web-scraped from online m
 > **The largest caveat:** these are *list prices*, not completed sales. They describe what sellers ask, not what buyers pay.
 
 ## Contents
-1. [Data at a glance](#data-at-a-glance)
+1. [Data at a glance](#data-at-a-glance) (incl. [The UK effect](#the-uk-effect))
 2. [The gold-plating pitfall](#the-gold-plating-pitfall)
 3. [Modeling: CatBoost](#modeling-catboost)
 4. [Explaining the model with SHAP](#explaining-the-model-with-shap)
@@ -39,6 +39,12 @@ The raw file has 3,607 listings across several brands, and Apple accounts for 65
 The UK has the lowest average price of any country with 30+ listings. Leaving it out raises the overall average from $578 to $593.
 
 <p align="center"><img src="images/03_country_means.png" width="800"></p>
+
+### The UK effect
+
+UK listings average $428, against $593 elsewhere (Welch p = 1.8e-52). This isn't just the UK listing cheaper models. The UK sits below each model's cross-country average in 17 of the 17 models listed there, by $126 on average.
+
+<p align="center"><img src="images/12_price_deviation_heatmap.png" width="900"></p>
 
 **Listing type.** Individuals (sellers with one listing, n = 1,257) average $561. That is 5.8% less than power sellers with 2+ listings ($596, n = 1,071). The gap is significant (Welch t-test p = 5.1e-8), but it is small inside the model: power_seller ranks 11th of 12 features.
 
@@ -84,17 +90,13 @@ Features interact. In a hypothetical gold-plated Series 2, *gold = 1* adds $47.5
 
 <p align="center"><img src="images/10_shap_series2_gold.png" width="700"></p>
 
-**The UK effect.** UK listings average $428, against $593 elsewhere (Welch p = 1.8e-52). Their country SHAP values average −$106, against +$9 for other countries, and **212 of 212 UK listings get a negative country SHAP value** (33 of 33 in the test set). The price gap itself is visible in the country chart in [Data at a glance](#data-at-a-glance).
-
-This isn't just the UK listing cheaper models. The UK sits below each model's cross-country average in 17 of the 17 models listed there, by $127 on average.
-
-<p align="center"><img src="images/12_price_deviation_heatmap.png" width="900"></p>
+**The UK effect in the model.** UK listings' country SHAP values average −$106, against +$9 for other countries, and **212 of 212 UK listings get a negative country SHAP value** (33 of 33 in the test set). The price gap itself is shown in [The UK effect](#the-uk-effect).
 
 ## Key findings
 
 1. **Model is the top feature, but simple comparisons mislead.** Series 2, 4 and 3 average more than the Ultra 3, and they have the highest gold-plating shares.
 2. **A feature can matter a lot in a niche and little overall.** Gold-plating goes with a 54.8% within-model premium, yet it ranks only 7th of 12 by mean |SHAP| ($9.37), because it affects just 123 listings.
-3. **Country is a large source of variation.** It ranks 2nd. The UK is below the cross-country average in 17 of 17 models, and the model lowers the prediction for every UK listing.
+3. **Country is a large source of variation.** It ranks 2nd. The UK is below the cross-country average in 17 of 17 models, and 212 of 212 UK listings get a negative country SHAP value.
 
 ## Limitations
 
