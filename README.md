@@ -1,5 +1,13 @@
 # Plated in Gold: What Drives Apple Smartwatch Resale Prices?
 
+<!-- pdf-exclude-start -->
+<p align="center">
+  <a href="https://andrecdavis.github.io/Plated-In-Gold/report.pdf"><img src="images/report_cover.png" width="420" alt="Plated in Gold — full report cover"></a>
+</p>
+
+<p align="center"><b><a href="https://andrecdavis.github.io/Plated-In-Gold/report.pdf">Read the full report (PDF)</a></b> · <a href="https://andrecdavis.github.io/Plated-In-Gold/">Interactive app</a></p>
+<!-- pdf-exclude-end -->
+
 **▶ Interactive version: [andrecdavis.github.io/Plated-In-Gold](https://andrecdavis.github.io/Plated-In-Gold/)**. It has filters, a price explorer and a per-listing SHAP explainer.
 
 ## Introduction and question

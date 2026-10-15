@@ -48,6 +48,8 @@ def find_chrome():
 
 def report_markdown():
     md = (ROOT / 'README.md').read_text(encoding='utf-8')
+    # GitHub-only blocks (cover image, etc.) must not appear in the PDF
+    md = re.sub(r'<!-- pdf-exclude-start -->.*?<!-- pdf-exclude-end -->\n?', '', md, flags=re.S)
     md = '## Introduction and question' + md.split('\n## Introduction and question', 1)[1]
     md = re.sub(r'\n## Contents\n.*?(?=\n## )', '\n', md, flags=re.S)
     md = md.split('\n## Project structure and reproduction')[0]
@@ -93,6 +95,9 @@ def main():
                         '--no-pdf-header-footer', '--run-all-compositor-stages-before-draw', '--virtual-time-budget=10000',
                         f'--print-to-pdf={out}', src.as_uri()], check=True, capture_output=True)
     print(f'wrote {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out} ({out.stat().st_size / 1e6:.2f} MB)')
+    app_pdf = ROOT / 'app' / 'report.pdf'
+    shutil.copy2(out, app_pdf)
+    print(f'copied to {app_pdf.relative_to(ROOT)}')
 
 
 if __name__ == '__main__':

@@ -22,7 +22,7 @@ app:             ## rebuild app/data.js
 check:           ## headless-browser smoke test + screenshots (needs requirements-dev.txt)
 	$(PY) scripts/check_app.py
 
-pdf:             ## build reports/Plated_in_Gold_Andre_Davis.pdf (needs pandoc + Chrome)
+pdf:             ## build reports/…pdf and copy to app/report.pdf (needs pandoc + Chrome)
 	$(PY) scripts/make_pdf.py
 
 serve:
