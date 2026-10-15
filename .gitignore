@@ -7,3 +7,7 @@ catboost_info/
 venv/
 *.egg-info/
 app/screenshots/*.tmp.png
+
+# generated report (rebuild with: make pdf)
+reports/*.pdf
+reports/*.html
